@@ -11,12 +11,39 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
 SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
-RANGE = "TWK!A1:H100"
-MATERIAL = "Nationalisme"
+RANGE = "TWK!A1:H10000"
+MATERIAL = "Campuran"
 SPREADSHEET_ID = "1ZAfe0hi6gl1hdss8Qxi0L1T-_zu6TU5_Ysyk_r3wIyY"
 FORMAT = "html"
-SIZE = 13
-URL = "https://belajarbro.id/cpns/latihan-soal/nasionalisme/"
+SIZE = 258
+URL = "https://belajarbro.id/cpns/soal/twk/"
+SCHEMA = {
+    "name": "Questions",
+    "baseSelector": "ol.semua > li.nomor",
+    "fields": [
+        {
+            "name": "question",
+            "selector": "div",
+            "type": FORMAT
+        },
+        {
+            "name": "options",
+            "selector": "ol.opsinya li",
+            "type": "list",
+            "fields": [
+                {
+                    "name": "option",
+                    "type": FORMAT
+                }
+            ]
+        },
+        {
+            "name": "explanation",
+            "selector": "div.jawaban",
+            "type": FORMAT,
+        }
+    ]
+}
 
 def credentials():
     creds = None
@@ -81,33 +108,6 @@ def convert_to_spreadsheet_format(data_list):
     return spreadsheet_data
 
 async def main():
-    schema = {
-        "name": "Questions",
-        "baseSelector": "ol.semua > li.nomor",
-        "fields": [
-            {
-                "name": "question",
-                "selector": "div",
-                "type": FORMAT
-            },
-            {
-                "name": "options",
-                "selector": "ol.opsinya li",
-                "type": "list",
-                "fields": [
-                    {
-                        "name": "option",
-                        "type": FORMAT
-                    }
-                ]
-            },
-            {
-                "name": "explanation",
-                "selector": "div.jawaban",
-                "type": FORMAT,
-            }
-        ]
-    }
 
     browser_cfg = BrowserConfig(
         headless=True,
@@ -120,7 +120,7 @@ async def main():
 
     run_cfg = CrawlerRunConfig(
         cache_mode=CacheMode.ENABLED,
-        extraction_strategy=JsonCssExtractionStrategy(schema, verbose=True),
+        extraction_strategy=JsonCssExtractionStrategy(SCHEMA, verbose=True),
         scan_full_page=True,
         simulate_user=True,
         magic=True
