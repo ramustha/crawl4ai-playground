@@ -11,12 +11,12 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
 SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
-RANGE = "TWK!A1:H10000"
+RANGE = "TIU!A1:H10"
 MATERIAL = "Campuran"
 SPREADSHEET_ID = "1ZAfe0hi6gl1hdss8Qxi0L1T-_zu6TU5_Ysyk_r3wIyY"
 FORMAT = "html"
-SIZE = 258
-URL = "https://belajarbro.id/cpns/soal/twk/"
+SIZE = 149
+URL = "https://belajarbro.id/cpns/soal/tiu/"
 SCHEMA = {
     "name": "Questions",
     "baseSelector": "ol.semua > li.nomor",
