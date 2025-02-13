@@ -11,24 +11,24 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
 SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
-RANGE = "TIU!A1:H10"
-MATERIAL = "Campuran"
+RANGE = "TIU!A1"
+MATERIAL = "Analogi Gambar"
 SPREADSHEET_ID = "1ZAfe0hi6gl1hdss8Qxi0L1T-_zu6TU5_Ysyk_r3wIyY"
 FORMAT = "html"
-SIZE = 149
-URL = "https://belajarbro.id/cpns/soal/tiu/"
+RANGE_SIZE = range(1, 9)
+URL = "https://belajarbro.id/skd/soal-figural.php?tes=analogi-gambar&bagian="
 SCHEMA = {
     "name": "Questions",
-    "baseSelector": "ol.semua > li.nomor",
+    "baseSelector": "div.row > div.kotak",
     "fields": [
         {
             "name": "question",
-            "selector": "div",
+            "selector": "div.s-soal > p",
             "type": FORMAT
         },
         {
             "name": "options",
-            "selector": "ol.opsinya li",
+            "selector": "ol.s-pilihan li",
             "type": "list",
             "fields": [
                 {
@@ -39,7 +39,7 @@ SCHEMA = {
         },
         {
             "name": "explanation",
-            "selector": "div.jawaban",
+            "selector": "div.pembahasan.collapse > ul",
             "type": FORMAT,
         }
     ]
@@ -77,6 +77,7 @@ def update_values(spreadsheet_id, range_name, value_input_option, _values):
                 spreadsheetId=spreadsheet_id,
                 range=range_name,
                 valueInputOption=value_input_option,
+                insertDataOption="INSERT_ROWS",
                 body=body,
             )
             .execute()
@@ -93,17 +94,18 @@ def convert_to_spreadsheet_format(data_list):
 
     for data in data_list:
         question = data.get("question", "")
-        options = [opt.get("option", "") for opt in data.get("options", [])]
+        if question != "":
+            options = [opt.get("option", "") for opt in data.get("options", [])]
 
-        # Ensure we always have exactly 5 options
-        while len(options) < 5:
-            options.append("")  # Fill missing options with empty strings
+            # Ensure we always have exactly 5 options
+            while len(options) < 5:
+                options.append("")  # Fill missing options with empty strings
 
-        explanation = data.get("explanation", "")
-        material = data.get("material", MATERIAL)
+            explanation = data.get("explanation", "")
+            material = data.get("material", MATERIAL)
 
-        # Append formatted row
-        spreadsheet_data.append([question] + options + [explanation] + [material])
+            # Append formatted row
+            spreadsheet_data.append([question] + options + [explanation] + [material])
 
     return spreadsheet_data
 
@@ -126,7 +128,7 @@ async def main():
         magic=True
     )
 
-    urls = [URL + str(index) + "/" for index in range(1, SIZE)]
+    urls = [URL + str(index) for index in RANGE_SIZE]
     print(f"Processing {urls}")
 
     async with AsyncWebCrawler(config=browser_cfg) as crawler:
@@ -145,7 +147,7 @@ async def main():
                 update_values(
                     SPREADSHEET_ID,
                     RANGE,
-                    "USER_ENTERED",
+                    "RAW",
                     spreadsheet_format,
                 )
             else:
